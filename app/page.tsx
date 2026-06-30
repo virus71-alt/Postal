@@ -110,7 +110,6 @@ export default function HomePage() {
           <h2 className="text-xl font-semibold tracking-tight text-ink">
             Browse by country
           </h2>
-          <p className="text-sm text-faint">{countries.length} and growing</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2">
           {countries.map((c) => (

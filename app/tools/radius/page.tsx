@@ -51,7 +51,7 @@ export default async function RadiusPage({ searchParams }: PageProps) {
       // 1. Get center postal code coordinates
       const { data: centerData, error: centerErr } = await supabase
         .from('postal_codes')
-        .select('postal_code, place_name, admin_name1, latitude, longitude')
+        .select('postal_code, place_name, admin_name1, lat, lng')
         .eq('country_code', country)
         .eq('postal_code', targetCode)
         .limit(1);
@@ -62,12 +62,16 @@ export default async function RadiusPage({ searchParams }: PageProps) {
 
       if (!centerRow) {
         errorMsg = `Center postal code "${targetCode}" was not found in ${countryName(country)}.`;
-      } else if (centerRow.latitude === null || centerRow.longitude === null) {
+      } else if (centerRow.lat === null || centerRow.lng === null) {
         errorMsg = `Coordinates are missing for the starting postal code "${targetCode}".`;
       } else {
-        center = centerRow;
-        const lat = centerRow.latitude;
-        const lng = centerRow.longitude;
+        const lat = Number(centerRow.lat);
+        const lng = Number(centerRow.lng);
+        center = {
+          ...centerRow,
+          latitude: lat,
+          longitude: lng,
+        };
 
         // 2. Determine radius in km
         const rKm = unit === 'miles' ? radiusVal * 1.60934 : radiusVal;
@@ -80,12 +84,12 @@ export default async function RadiusPage({ searchParams }: PageProps) {
         // 3. Query bounding box in database
         const { data: candidates, error: queryErr } = await supabase
           .from('postal_codes')
-          .select('postal_code, place_name, admin_name1, latitude, longitude')
+          .select('postal_code, place_name, admin_name1, lat, lng')
           .eq('country_code', country)
-          .gte('latitude', lat - deltaLat)
-          .lte('latitude', lat + deltaLat)
-          .gte('longitude', lng - deltaLng)
-          .lte('longitude', lng + deltaLng)
+          .gte('lat', lat - deltaLat)
+          .lte('lat', lat + deltaLat)
+          .gte('lng', lng - deltaLng)
+          .lte('lng', lng + deltaLng)
           .limit(300);
 
         if (queryErr) throw queryErr;
@@ -111,9 +115,11 @@ export default async function RadiusPage({ searchParams }: PageProps) {
           // Filter and map candidates
           const seen = new Set<string>();
           for (const item of candidates) {
-            if (item.latitude === null || item.longitude === null) continue;
+            if (item.lat === null || item.lng === null) continue;
             
-            const dist = getDistance(item.latitude, item.longitude);
+            const itemLat = Number(item.lat);
+            const itemLng = Number(item.lng);
+            const dist = getDistance(itemLat, itemLng);
             if (dist <= radiusVal && item.postal_code !== centerRow.postal_code) {
               // Deduplicate so we only show the closest place name for each code
               if (!seen.has(item.postal_code)) {
@@ -123,8 +129,8 @@ export default async function RadiusPage({ searchParams }: PageProps) {
                   place_name: item.place_name,
                   admin_name1: item.admin_name1,
                   distance: dist,
-                  latitude: item.latitude,
-                  longitude: item.longitude,
+                  latitude: itemLat,
+                  longitude: itemLng,
                 });
               }
             }

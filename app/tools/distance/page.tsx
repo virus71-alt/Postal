@@ -46,13 +46,13 @@ export default async function DistancePage({ searchParams }: PageProps) {
       const [fromRes, toRes] = await Promise.all([
         supabase
           .from('postal_codes')
-          .select('postal_code, place_name, admin_name1, latitude, longitude')
+          .select('postal_code, place_name, admin_name1, lat, lng')
           .eq('country_code', country)
           .eq('postal_code', fromCode)
           .limit(1),
         supabase
           .from('postal_codes')
-          .select('postal_code, place_name, admin_name1, latitude, longitude')
+          .select('postal_code, place_name, admin_name1, lat, lng')
           .eq('country_code', country)
           .eq('postal_code', toCode)
           .limit(1),
@@ -66,19 +66,19 @@ export default async function DistancePage({ searchParams }: PageProps) {
       } else if (!toData) {
         errorMsg = `Postal code "${toCode}" was not found in ${countryName(country)}.`;
       } else if (
-        fromData.latitude === null ||
-        fromData.longitude === null ||
-        toData.latitude === null ||
-        toData.longitude === null
+        fromData.lat === null ||
+        fromData.lng === null ||
+        toData.lat === null ||
+        toData.lng === null
       ) {
         errorMsg = `Geographical coordinates are missing for one or both of these postal codes.`;
       } else {
         // Calculate Great-Circle distance via Haversine Formula
         const R = 6371; // Earth radius in km
-        const lat1 = fromData.latitude;
-        const lon1 = fromData.longitude;
-        const lat2 = toData.latitude;
-        const lon2 = toData.longitude;
+        const lat1 = Number(fromData.lat);
+        const lon1 = Number(fromData.lng);
+        const lat2 = Number(toData.lat);
+        const lon2 = Number(toData.lng);
 
         const dLat = ((lat2 - lat1) * Math.PI) / 180;
         const dLon = ((lon2 - lon1) * Math.PI) / 180;
@@ -93,8 +93,16 @@ export default async function DistancePage({ searchParams }: PageProps) {
         const distMiles = distKm * 0.621371;
 
         result = {
-          from: fromData,
-          to: toData,
+          from: {
+            ...fromData,
+            latitude: lat1,
+            longitude: lon1,
+          },
+          to: {
+            ...toData,
+            latitude: lat2,
+            longitude: lon2,
+          },
           km: distKm,
           miles: distMiles,
         };

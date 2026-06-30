@@ -24,11 +24,11 @@ export async function GET(request: NextRequest) {
     let delta = 0.2;
     let { data, error } = await supabase
       .from('postal_codes')
-      .select('postal_code, country_code, latitude, longitude, place_name')
-      .gte('latitude', lat - delta)
-      .lte('latitude', lat + delta)
-      .gte('longitude', lng - delta)
-      .lte('longitude', lng + delta)
+      .select('postal_code, country_code, lat, lng, place_name')
+      .gte('lat', lat - delta)
+      .lte('lat', lat + delta)
+      .gte('lng', lng - delta)
+      .lte('lng', lng + delta)
       .limit(100);
 
     if (error) throw error;
@@ -38,11 +38,11 @@ export async function GET(request: NextRequest) {
       delta = 1.0;
       const retry = await supabase
         .from('postal_codes')
-        .select('postal_code, country_code, latitude, longitude, place_name')
-        .gte('latitude', lat - delta)
-        .lte('latitude', lat + delta)
-        .gte('longitude', lng - delta)
-        .lte('longitude', lng + delta)
+        .select('postal_code, country_code, lat, lng, place_name')
+        .gte('lat', lat - delta)
+        .lte('lat', lat + delta)
+        .gte('lng', lng - delta)
+        .lte('lng', lng + delta)
         .limit(100);
 
       if (retry.error) throw retry.error;
@@ -55,8 +55,8 @@ export async function GET(request: NextRequest) {
 
     // 3. Find the exact closest row using Euclidean distance in JS
     const getDistanceSq = (p: any) => {
-      const dLat = (p.latitude || 0) - lat;
-      const dLng = (p.longitude || 0) - lng;
+      const dLat = (p.lat || 0) - lat;
+      const dLng = (p.lng || 0) - lng;
       return dLat * dLat + dLng * dLng;
     };
 

@@ -84,19 +84,19 @@ export default async function PostalCodePage({
       const delta = 0.15; // ~15km bounding box
       const { data: geoData } = await supabase
         .from('postal_codes')
-        .select('postal_code, place_name, latitude, longitude')
+        .select('postal_code, place_name, lat, lng')
         .eq('country_code', entry.country_code)
         .neq('postal_code', entry.postal_code)
-        .gte('latitude', lat - delta)
-        .lte('latitude', lat + delta)
-        .gte('longitude', lng - delta)
-        .lte('longitude', lng + delta)
+        .gte('lat', lat - delta)
+        .lte('lat', lat + delta)
+        .gte('lng', lng - delta)
+        .lte('lng', lng + delta)
         .limit(30);
 
       if (geoData && geoData.length > 0) {
         const getDistSq = (p: any) => {
-          const dLat = (p.latitude || 0) - lat;
-          const dLng = (p.longitude || 0) - lng;
+          const dLat = (Number(p.lat) || 0) - lat;
+          const dLng = (Number(p.lng) || 0) - lng;
           return dLat * dLat + dLng * dLng;
         };
         geoData.sort((a, b) => getDistSq(a) - getDistSq(b));
