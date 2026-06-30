@@ -81,7 +81,22 @@ export default function SearchBox({ size = 'compact' }: Props) {
       .then((list: Country[]) => {
         if (Array.isArray(list) && list.length) {
           setCountries(list);
-          setCountry((c) => (list.some((x) => x.code === c) ? c : list[0].code));
+          
+          let defaultCc = list[0].code;
+          try {
+            const locale = navigator.language;
+            if (locale) {
+              const parts = locale.split('-');
+              const browserCc = parts[parts.length - 1].toUpperCase();
+              if (list.some((x) => x.code === browserCc)) {
+                defaultCc = browserCc;
+              }
+            }
+          } catch (e) {
+            console.error(e);
+          }
+
+          setCountry((c) => (list.some((x) => x.code === c) ? c : defaultCc));
         }
       })
       .catch(() => {});
