@@ -5,6 +5,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import JsonLd from '@/components/JsonLd';
 import { getPostalEntry, getPinsForDistrict, countryName } from '@/lib/postalData';
 import { slugify } from '@/lib/slug';
+import { supabase } from '@/lib/supabase';
 import AdUnit from '@/components/AdUnit';
 import CopyAddressButton from '@/components/CopyAddressButton';
 import TimezoneClock from '@/components/TimezoneClock';
@@ -72,12 +73,59 @@ export default async function PostalCodePage({
     pins: districtPins,
   };
 
-  // Up to 8 neighbouring PINs from the same district, centred on this one.
-  const i = districtPins.findIndex((p) => p.postal_code === entry.postal_code);
-  const nearby = districtPins
-    .slice(Math.max(0, i - 4), i + 5)
-    .filter((p) => p.postal_code !== entry.postal_code)
-    .slice(0, 8);
+  // Query geographically closest postal codes using coordinates
+  let nearby: any[] = [];
+  if (hasCoords) {
+    try {
+      const delta = 0.15; // ~15km bounding box
+      const { data: geoData } = await supabase
+        .from('postal_codes')
+        .select('postal_code, place_name, latitude, longitude')
+        .eq('country_code', entry.country_code)
+        .neq('postal_code', entry.postal_code)
+        .gte('latitude', lat - delta)
+        .lte('latitude', lat + delta)
+        .gte('longitude', lng - delta)
+        .lte('longitude', lng + delta)
+        .limit(30);
+
+      if (geoData && geoData.length > 0) {
+        const getDistSq = (p: any) => {
+          const dLat = (p.latitude || 0) - lat;
+          const dLng = (p.longitude || 0) - lng;
+          return dLat * dLat + dLng * dLng;
+        };
+        geoData.sort((a, b) => getDistSq(a) - getDistSq(b));
+
+        const seen = new Set<string>();
+        for (const item of geoData) {
+          if (!seen.has(item.postal_code)) {
+            seen.add(item.postal_code);
+            nearby.push({
+              postal_code: item.postal_code,
+              primaryPlace: item.place_name,
+            });
+            if (nearby.length >= 8) break;
+          }
+        }
+      }
+    } catch (err) {
+      console.error('[Nearby Codes] Error fetching:', err);
+    }
+  }
+
+  // Fallback to district list if coordinates missing or query yields no results
+  if (nearby.length === 0) {
+    const idx = districtPins.findIndex((p) => p.postal_code === entry.postal_code);
+    nearby = districtPins
+      .slice(Math.max(0, idx - 4), idx + 5)
+      .filter((p) => p.postal_code !== entry.postal_code)
+      .slice(0, 8)
+      .map((p) => ({
+        postal_code: p.postal_code,
+        primaryPlace: p.primaryPlace,
+      }));
+  }
 
   const lat = Number(primary.lat);
   const lng = Number(primary.lng);
@@ -362,7 +410,7 @@ export default async function PostalCodePage({
       {nearby.length > 0 && (
         <section className="mt-8">
           <h2 className="text-lg font-semibold">
-            Nearby PIN Codes in {district.name}
+            Geographically Nearby Postal Codes
           </h2>
           <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {nearby.map((p) => (

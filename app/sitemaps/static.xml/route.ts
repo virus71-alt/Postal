@@ -10,6 +10,8 @@ export function GET() {
     `${SITE}/methodology/`,
     `${SITE}/postal-code-guide/`,
     `${SITE}/contact/`,
+    `${SITE}/tools/distance/`,
+    `${SITE}/tools/radius/`,
     `${SITE}/privacy/`,
     `${SITE}/terms/`,
   ];
