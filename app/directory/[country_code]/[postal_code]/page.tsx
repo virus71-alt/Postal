@@ -6,6 +6,8 @@ import JsonLd from '@/components/JsonLd';
 import { getPostalEntry, getPinsForDistrict, countryName } from '@/lib/postalData';
 import { slugify } from '@/lib/slug';
 import AdUnit from '@/components/AdUnit';
+import CopyAddressButton from '@/components/CopyAddressButton';
+import TimezoneClock from '@/components/TimezoneClock';
 
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://postalatlas.com').replace(
   /\/$/,
@@ -252,6 +254,14 @@ export default async function PostalCodePage({
         <p className="mt-3 text-sm text-muted">
           {primary.place_name}, {country}
         </p>
+        <CopyAddressButton
+          postalCode={entry.postal_code}
+          placeName={primary.place_name}
+          adminName1={primary.admin_name1}
+          adminName2={primary.admin_name2}
+          country={country}
+          countryCode={entry.country_code}
+        />
       </section>
 
       <section className="mt-8">
@@ -315,6 +325,10 @@ export default async function PostalCodePage({
             ))}
           </ul>
         </section>
+      )}
+
+      {hasCoords && (
+        <TimezoneClock longitude={lng} />
       )}
 
       {mapSrc && (
