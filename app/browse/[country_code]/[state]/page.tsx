@@ -77,6 +77,10 @@ export default async function StatePage({
         {country.name}. Pick a district to see its postal codes.
       </p>
 
+      <p className="mt-4 max-w-3xl text-sm text-ink leading-relaxed">
+        This regional section provides a comprehensive postal code directory for the state/province of <strong>{stateObj.name}</strong>, located within <strong>{country.name}</strong>. Here you will find mappings for <strong>{stateObj.pinCount.toLocaleString()}</strong> unique postal and ZIP code zones distributed across <strong>{stateObj.placeCount.toLocaleString()}</strong> distinct cities, towns, and localities. Select a specific administrative district or county from the organized grid below to drill down into municipal and localized ZIP routing coordinates.
+      </p>
+
       {/* AD PLACEMENT 1 */}
       <AdUnit slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP} className="my-6" />
 

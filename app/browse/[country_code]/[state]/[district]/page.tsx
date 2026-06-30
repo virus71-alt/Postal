@@ -82,6 +82,10 @@ export default async function DistrictPage({
         {district.name} district, {state.name}, {country.name}.
       </p>
 
+      <p className="mt-4 max-w-3xl text-sm text-ink leading-relaxed">
+        This directory section displays the verified postal code structure for the <strong>{district.name}</strong> district within the region of <strong>{state.name}</strong>, <strong>{country.name}</strong>. Mapped below are all <strong>{district.pins.length.toLocaleString()}</strong> unique routing code entries registered in this district, along with their primary associated places and localities. Click any item in the grid below to view specific coordinate coordinates, detail cards, and interactive location maps.
+      </p>
+
       {/* AD PLACEMENT 1 */}
       <AdUnit slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP} className="my-6" />
 

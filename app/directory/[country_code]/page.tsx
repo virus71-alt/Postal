@@ -56,6 +56,10 @@ export default async function CountryPage({
         browse its districts and PIN codes.
       </p>
 
+      <p className="mt-4 max-w-3xl text-sm text-ink leading-relaxed">
+        Welcome to the official geographical directory for <strong>{name}</strong>. Here you will find structured access to the entire country's postal systems, indexing a total of <strong>{pinCount.toLocaleString()}</strong> unique postal and ZIP code zones. By organizing our data across <strong>{states.length}</strong> main states, provinces, or territories, we make it simple to track down administrative details and regional structures. Browse the regional list below to begin locating codes, counties, and municipal districts.
+      </p>
+
       {/* AD PLACEMENT 1 */}
       <AdUnit slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP} className="my-6" />
 

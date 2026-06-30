@@ -235,6 +235,10 @@ export default async function PostalCodePage({
         <p id="direct-answer" className="mt-3 text-muted">{directAnswer}</p>
       </header>
 
+      <p className="mt-4 text-sm text-ink leading-relaxed">
+        This reference page provides detailed geographical and administrative statistics for postal code <strong>{entry.postal_code}</strong>, which primarily routes to the locality of <strong>{primary.place_name}</strong>. Mapped within the region of <strong>{primary.admin_name1 ?? 'N/A'}</strong>{primary.admin_name2 ? <> (specifically inside the <strong>{primary.admin_name2}</strong> district)</> : null} in <strong>{country}</strong>, this routing zone plays a vital role in local logistics, mail delivery coordination, and location verification services. Below you will find specific coordinate mappings, a list of all associated areas sharing this postal code, and an interactive map view for navigation.
+      </p>
+
       {/* AD PLACEMENT 1 */}
       <AdUnit slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP} className="my-6" />
 
