@@ -1,0 +1,73 @@
+name: Build & Deploy PostalAtlas
+
+# Manual only (Actions tab → Run workflow). The push auto-trigger was removed:
+# the full dataset no longer fits in one 6h job, so deploys are rolled out in
+# subsets via the ONLY_COUNTRIES input below. Leave it blank to build everything.
+on:
+  workflow_dispatch:
+    inputs:
+      only_countries:
+        description: 'Build pages for ONLY these ISO codes (comma-separated, blank = all). Roll out the dataset in subsets to stay under the 6h job limit. e.g. PE,DZ,CO,...'
+        required: false
+        default: ''
+
+# Don't run two deploys at once; cancel an in-progress one if a new push lands.
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Frees up ~30GB of disk space before the build starts
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Move rclone installation before the build step
+      - name: Install rclone
+        run: |
+          curl https://rclone.org/install.sh | sudo bash
+          rclone version
+
+      # Pass R2 secrets to the Node process so it can sync internally
+      - name: Build and Sync all countries
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SITE_URL: https://postalatlas.com
+          # Rclone variables needed for the internal sync
+          RCLONE_CONFIG_R2_TYPE: s3
+          RCLONE_CONFIG_R2_PROVIDER: Cloudflare
+          RCLONE_CONFIG_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          RCLONE_CONFIG_R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          RCLONE_CONFIG_R2_REGION: auto
+          RCLONE_CONFIG_R2_NO_CHECK_BUCKET: "true"
+          # Blank on push (builds all); set via the "Run workflow" form to build a subset.
+          ONLY_COUNTRIES: ${{ github.event.inputs.only_countries }}
+        run: npm run build:all
+
+      - name: Summary
+        run: echo "Deployment complete! Check Cloudflare R2 for updates."

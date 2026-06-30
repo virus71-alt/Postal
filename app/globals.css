@@ -1,0 +1,32 @@
+/* source(none) disables Tailwind v4's automatic filesystem content scan, which
+   otherwise walks the whole project — including the 1M+ generated HTML files in
+   out/ and out-merged/ — and makes the webpack compile hang. Scan only source. */
+@import "tailwindcss" source(none);
+@source "../app";
+@source "../components";
+
+/* Minimalist design tokens — a near-monochrome ink/paper palette with a single
+   restrained blue accent used only for actions and links. */
+@theme {
+  --color-ink: #18181b;        /* primary text */
+  --color-muted: #71717a;      /* secondary text */
+  --color-faint: #a1a1aa;      /* tertiary / captions */
+  --color-line: #e7e7ea;       /* hairline borders */
+  --color-paper: #ffffff;      /* surfaces */
+  --color-accent: #0b7468;     /* "Atlas Teal" — the one brand accent */
+  --color-accent-dark: #08574e;/* hover/pressed */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.011em;
+}
+
+::selection {
+  background-color: color-mix(in srgb, var(--color-accent) 18%, transparent);
+}

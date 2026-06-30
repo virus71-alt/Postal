@@ -1,0 +1,32 @@
+# dependencies
+/node_modules
+
+# next.js build artifacts
+/.next/
+/out/
+/out-merged/
+
+# env files — never commit credentials
+.env*.local
+.env
+
+# misc
+*.tsbuildinfo
+next-env.d.ts
+
+# local source data (large)
+*.parquet
+
+# deploy: built static site + rclone config with R2 secret (never commit)
+/server/
+rclone-r2.conf
+
+# generated at build time by scripts/genPinManifest.mjs (CI regenerates from
+# Supabase) — don't bloat the repo with them
+/public/pins/
+/public/search/
+/public/sitemaps/
+/public/stats.json
+/public/countries.json
+/public/sitemap.xml
+/public/robots.txt

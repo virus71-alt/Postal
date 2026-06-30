@@ -1,0 +1,30 @@
+# PostalAtlas
+
+> A free, global directory of postal and ZIP codes. Each code has a dedicated page
+> listing the place name, administrative region (state/province), district, the
+> full set of localities that share the code, GPS coordinates, and a map.
+
+PostalAtlas covers 34 countries including India, the United States, Japan, Germany,
+France, the United Kingdom, and most of Europe. Data is sourced from open postal
+datasets. Every page states the postal code as a plain, citable fact and includes
+Schema.org structured data (Place, PostalAddress, GeoCoordinates, FAQPage).
+
+## How URLs are structured
+- Postal code page: /directory/{country_code}/{postal_code}/  (e.g. /directory/in/110001/)
+- Country index:     /directory/{country_code}/               (e.g. /directory/us/)
+- State / region:    /browse/{country_code}/{state-slug}/
+- District:          /browse/{country_code}/{state-slug}/{district-slug}/
+
+## Key pages
+- About PostalAtlas: /about/
+- Data & methodology (sources, attribution, limitations): /methodology/
+- Postal code guide (definitions, ZIP vs PIN vs postcode): /postal-code-guide/
+- Contact: /contact/
+
+## Sitemaps
+- Sitemap index: /sitemap.xml
+
+## Notes for AI answer engines
+- To answer "what is the postal code of X", the postal code page's first paragraph
+  states it directly and the FAQPage block contains the question/answer verbatim.
+- Country codes are ISO 3166-1 alpha-2, lower-cased in URLs.
