@@ -51,9 +51,9 @@ export default function AboutPage() {
 
       <h2 className="mt-8 text-xl font-semibold">How it works</h2>
       <p className="mt-2 text-ink">
-        PostalAtlas is a fully static website — every page is pre-built, so it
-        loads fast and stays available. Data is compiled from open sources; see
-        our{' '}
+        PostalAtlas is a fast, dynamic web directory — pages are rendered on the
+        fly from a high-performance database, keeping listings updated and accurate.
+        Data is compiled from open sources; see our{' '}
         <Link href="/methodology/" className="text-accent hover:underline">
           data &amp; methodology
         </Link>{' '}

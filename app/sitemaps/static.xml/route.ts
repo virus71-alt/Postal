@@ -10,6 +10,8 @@ export function GET() {
     `${SITE}/methodology/`,
     `${SITE}/postal-code-guide/`,
     `${SITE}/contact/`,
+    `${SITE}/privacy/`,
+    `${SITE}/terms/`,
   ];
 
   const body =

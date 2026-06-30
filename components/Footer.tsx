@@ -26,6 +26,8 @@ export default function Footer() {
             ['Data & Methodology', '/methodology/'],
             ['Postal Code Guide', '/postal-code-guide/'],
             ['Contact', '/contact/'],
+            ['Privacy Policy', '/privacy/'],
+            ['Terms of Service', '/terms/'],
           ].map(([label, href]) => (
             <Link
               key={href}
