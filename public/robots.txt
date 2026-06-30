@@ -1,0 +1,43 @@
+User-agent: *
+Allow: /
+Crawl-delay: 10
+
+# Specifically allow Googlebot and Mediapartners-Google (AdSense) without crawl delays
+User-agent: Googlebot
+Allow: /
+
+User-agent: Mediapartners-Google
+Allow: /
+
+# Block aggressive commercial bots to save server resources on dynamic SSR
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: DataForSeoBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: MauiBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: ImagesiftBot
+Disallow: /
+
+Sitemap: https://postalatlas.com/sitemap.xml
