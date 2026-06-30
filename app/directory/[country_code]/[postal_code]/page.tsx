@@ -73,6 +73,10 @@ export default async function PostalCodePage({
     pins: districtPins,
   };
 
+  const lat = Number(primary.lat);
+  const lng = Number(primary.lng);
+  const hasCoords = Number.isFinite(lat) && Number.isFinite(lng);
+
   // Query geographically closest postal codes using coordinates
   let nearby: any[] = [];
   if (hasCoords) {
@@ -127,9 +131,6 @@ export default async function PostalCodePage({
       }));
   }
 
-  const lat = Number(primary.lat);
-  const lng = Number(primary.lng);
-  const hasCoords = Number.isFinite(lat) && Number.isFinite(lng);
   const d = 0.04; // ~4km bounding box
   const mapSrc = hasCoords
     ? `https://www.openstreetmap.org/export/embed.html?bbox=${(lng - d).toFixed(4)},${(lat - d).toFixed(4)},${(lng + d).toFixed(4)},${(lat + d).toFixed(4)}&layer=mapnik&marker=${lat.toFixed(5)},${lng.toFixed(5)}`
