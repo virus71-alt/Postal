@@ -22,7 +22,58 @@ export default function SearchBox({ size = 'compact' }: Props) {
   const [pinSuggestions, setPinSuggestions] = useState<string[]>([]);
   const [nameSuggestions, setNameSuggestions] = useState<NameEntry[]>([]);
   const [loading, setLoading] = useState(false);
+  const [locating, setLocating] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
+
+  const onGeolocate = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    setLocating(true);
+    setError(null);
+    setOpen(false);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+
+          const res = await fetch(`/api/reverse-geocode?lat=${lat}&lng=${lng}`);
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error || 'Failed to locate postal code');
+          }
+
+          if (data.postal_code && data.country_code) {
+            window.location.href = `/directory/${data.country_code.toLowerCase()}/${encodeURIComponent(data.postal_code.toLowerCase())}/`;
+          } else {
+            throw new Error('Invalid response from location service');
+          }
+        } catch (err: any) {
+          console.error(err);
+          setError(err.message || 'Could not determine postal code for your location.');
+          setOpen(true);
+        } finally {
+          setLocating(false);
+        }
+      },
+      (err) => {
+        console.error(err);
+        let msg = 'Could not access your location. Please check browser permissions.';
+        if (err.code === err.PERMISSION_DENIED) {
+          msg = 'Location access was denied. Please enable location permissions in your browser.';
+        }
+        setError(msg);
+        setOpen(true);
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
 
   useEffect(() => {
     fetch('/countries.json')
@@ -228,6 +279,27 @@ export default function SearchBox({ size = 'compact' }: Props) {
             large ? 'px-4 py-3 sm:py-3.5' : 'px-3 py-2'
           }`}
         />
+        <button
+          type="button"
+          onClick={onGeolocate}
+          disabled={locating}
+          title="Find my current location's postal code"
+          className={`flex items-center justify-center border-b sm:border-b-0 sm:border-l border-line text-muted hover:text-ink transition-colors bg-white ${
+            large ? 'px-4 py-3 sm:py-0' : 'px-3 py-2 sm:py-0'
+          } ${locating ? 'opacity-70 cursor-not-allowed' : ''}`}
+        >
+          {locating ? (
+            <svg className="animate-spin h-5 w-5 text-muted" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+          ) : (
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          )}
+        </button>
         <button
           type="submit"
           disabled={loading}
