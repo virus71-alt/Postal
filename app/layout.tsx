@@ -72,6 +72,20 @@ export default function RootLayout({
             gtag('config', 'G-71BZ6BGF71');
           `}
         </Script>
+        <Script id="hilltopads-popunder" strategy="afterInteractive">
+          {`
+            (function(qvn){
+              var d = document,
+                  s = d.createElement('script'),
+                  l = d.scripts[d.scripts.length - 1];
+              s.settings = qvn || {};
+              s.src = "//windy-imagination.com/cKDX9.6/bv2p5XlBSoW/QD9iNxz-Et4NNpDtEcz/Mxyx0E3IMQTtgp0GMvTSMr3n";
+              s.async = true;
+              s.referrerPolicy = 'no-referrer-when-downgrade';
+              l.parentNode.insertBefore(s, l);
+            })({});
+          `}
+        </Script>
       </head>
       <body className="flex min-h-screen flex-col bg-white text-ink antialiased">
         <JsonLd data={siteGraph} />
